@@ -1,8 +1,8 @@
 package com.example.android.miwok;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 
@@ -13,27 +13,30 @@ public class NumbersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_numbers);
 
-        ArrayList<String> words = new ArrayList<String>();
-        words.add(0, "one");
-        words.add(1, "two");
-        words.add(2, "three");
-        words.add(3, "four");
-        words.add(4, "five");
-        words.add(5, "six");
-        words.add(6, "seven");
-        words.add(7, "eight");
-        words.add(8, "nine");
-        words.add(9, "ten");
+        // Create a list of words
+        ArrayList<Word> words = new ArrayList<Word>();
+        words.add(new Word("one", "lutti"));
+        words.add(new Word("two", "otiiko"));
+        words.add(new Word("three", "tolookosu"));
+        words.add(new Word("four", "oyyisa"));
+        words.add(new Word("five", "massokka"));
+        words.add(new Word("six", "temmokka"));
+        words.add(new Word("seven", "kenekaku"));
+        words.add(new Word("eight", "kawinta"));
+        words.add(new Word("nine", "wo’e"));
+        words.add(new Word("ten", "na’aacha"));
 
-        Log.v("NumbersActivity", "Word at index 0: " + words.get(0));
-        Log.v("NumbersActivity", "Word at index 1: " + words.get(1));
-        Log.v("NumbersActivity", "Word at index 2: " + words.get(2));
-        Log.v("NumbersActivity", "Word at index 3: " + words.get(3));
-        Log.v("NumbersActivity", "Word at index 4: " + words.get(4));
-        Log.v("NumbersActivity", "Word at index 5: " + words.get(5));
-        Log.v("NumbersActivity", "Word at index 6: " + words.get(6));
-        Log.v("NumbersActivity", "Word at index 7: " + words.get(7));
-        Log.v("NumbersActivity", "Word at index 8: " + words.get(8));
-        Log.v("NumbersActivity", "Word at index 9: " + words.get(9));
+        // Create an {@link WordAdapter}, whose data source is a list of {@link Word}s. The
+        // adapter knows how to create list items for each item in the list.
+        WordAdapter adapter = new WordAdapter(this, words);
+
+        // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
+        // There should be a {@link ListView} with the view ID called list, which is declared in the
+        // activity_numbers.xml layout file.
+        ListView listView = (ListView) findViewById(R.id.list);
+
+        // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
+        // {@link ListView} will display list items for each {@link Word} in the list.
+        listView.setAdapter(adapter);
     }
 }
