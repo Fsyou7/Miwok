@@ -1,10 +1,18 @@
 package com.example.android.miwok;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static android.R.attr.button;
 
 public class NumbersActivity extends AppCompatActivity {
 
@@ -12,6 +20,9 @@ public class NumbersActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
+
+        //Create audio object
+        final MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.number_one);
 
         // Create a list of words
         ArrayList<Word> words = new ArrayList<Word>();
@@ -33,10 +44,20 @@ public class NumbersActivity extends AppCompatActivity {
         // Find the {@link ListView} object in the view hierarchy of the {@link Activity}.
         // There should be a {@link ListView} with the view ID called list, which is declared in the
         // word_list.xml file.
-        ListView listView = (ListView) findViewById(R.id.list);
+        final ListView listView = (ListView) findViewById(R.id.list);
 
         // Make the {@link ListView} use the {@link WordAdapter} we created above, so that the
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(adapter);
+
+        // Create a clickListener to play the audio file
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                        @Override
+                                        public void onItemClick (AdapterView < ? > adapter, View view,int position, long arg){
+                                            mediaPlayer.start(); // no need to call prepare(); create() does that for you
+                                        }
+                                    }
+        );
+
     }
 }
