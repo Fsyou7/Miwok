@@ -15,8 +15,6 @@ public class Word {
     /*Reference to the image file*/
     private int mImageResourceId = NO_IMAGE_PROVIDED;
 
-
-
     private static final int NO_IMAGE_PROVIDED = -1;
 
     /*Create a new word object
@@ -29,7 +27,6 @@ public class Word {
     public Word (String defaultTranslation, String miwokTranslation){
         mDefaultTranslation = defaultTranslation;
         mMiwokTranslation = miwokTranslation;
-
     }
 
 

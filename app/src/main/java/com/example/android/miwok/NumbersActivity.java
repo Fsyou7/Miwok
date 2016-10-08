@@ -16,13 +16,14 @@ import static android.R.attr.button;
 
 public class NumbersActivity extends AppCompatActivity {
 
+    //Create audio object
+    private MediaPlayer mMediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
 
-        //Create audio object
-        final MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.number_one);
+
 
         // Create a list of words
         ArrayList<Word> words = new ArrayList<Word>();
@@ -54,7 +55,8 @@ public class NumbersActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick (AdapterView < ? > adapter, View view,int position, long arg){
-                                            mediaPlayer.start(); // no need to call prepare(); create() does that for you
+                                            mMediaPlayer = MediaPlayer.create(NumbersActivity.this, R.raw.number_one);
+                                            mMediaPlayer.start(); // no need to call prepare(); create() does that for you
                                         }
                                     }
         );
