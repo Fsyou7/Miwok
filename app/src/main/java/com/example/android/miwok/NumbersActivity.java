@@ -1,8 +1,10 @@
 package com.example.android.miwok;
 
+import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -13,17 +15,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.R.attr.button;
+import static android.R.attr.id;
+import static android.R.attr.resource;
 
 public class NumbersActivity extends AppCompatActivity {
 
+    private static final String TAG = "NumbersActivity";
+
     //Create audio object
     private MediaPlayer mMediaPlayer;
+
+    /**
+     * Clean up the media player by releasing its resources.
+     */
+    private void releaseMediaPlayer() {
+        // If the media player is not null, then it may be currently playing a sound.
+        if (mMediaPlayer != null) {
+            // Regardless of the current state of the media player, release its resources
+            // because we no longer need it.
+            mMediaPlayer.release();
+
+            // Set the media player back to null. For our code, we've decided that
+            // setting the media player to null is an easy way to tell that the media player
+            // is not configured to play an audio file at the moment.
+            mMediaPlayer = null;
+            Log.d(TAG, "MediaPlayer released");
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.word_list);
-
-
 
         // Create a list of words
         final ArrayList<Word> words = new ArrayList<Word>();
@@ -53,15 +76,25 @@ public class NumbersActivity extends AppCompatActivity {
 
         // Create a clickListener to play the audio file
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick (AdapterView < ? > adapter, View view,int position, long arg){
-//                                            mMediaPlayer = MediaPlayer.create(NumbersActivity.this, R.raw.number_one);
-
-
-                                            mMediaPlayer = MediaPlayer.create(NumbersActivity.this, adapter.getItemAtPosition(position).getAudioResourceID());
-                                            mMediaPlayer.start(); // no need to call prepare(); create() does that for you
-                                        }
+            @Override
+            public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
+                Word audioResource = (Word)listView.getItemAtPosition(position);
+                releaseMediaPlayer();
+                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
+                mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+            }
         });
 
+        if(mMediaPlayer != null){
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    releaseMediaPlayer();
+                }
+            });
+        }
+
     }
+
+
 }
