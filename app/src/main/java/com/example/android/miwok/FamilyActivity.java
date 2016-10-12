@@ -3,6 +3,7 @@ package com.example.android.miwok;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -11,8 +12,27 @@ import java.util.ArrayList;
 
 public class FamilyActivity extends AppCompatActivity {
 
+    private static final String TAG = "FamilyActivity";
     //Create audio object
     private MediaPlayer mMediaPlayer;
+
+    /**
+     * Clean up the media player by releasing its resources.
+     */
+    private void releaseMediaPlayer() {
+        // If the media player is not null, then it may be currently playing a sound.
+        if (mMediaPlayer != null) {
+            // Regardless of the current state of the media player, release its resources
+            // because we no longer need it.
+            mMediaPlayer.release();
+
+            // Set the media player back to null. For our code, we've decided that
+            // setting the media player to null is an easy way to tell that the media player
+            // is not configured to play an audio file at the moment.
+            mMediaPlayer = null;
+            Log.d(TAG, "MediaPlayer released");
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +73,21 @@ public class FamilyActivity extends AppCompatActivity {
                 * Store the audio resource ID to be passed to the mMediaPlayer variable*/
                 Word audioResource = (Word)listView.getItemAtPosition(position);
 
+                releaseMediaPlayer();
                 mMediaPlayer = MediaPlayer.create(FamilyActivity.this, audioResource.getAudioResourceId());
                 mMediaPlayer.start(); // no need to call prepare(); create() does that for you
             }
         });
 
+        //Release the Media Player once the audio playback is complete
+        if(mMediaPlayer != null){
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    releaseMediaPlayer();
+                    Log.d(TAG, "MediaPlayer released again");
+                }
+            });
+        }
     }
 }

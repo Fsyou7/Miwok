@@ -85,6 +85,7 @@ public class NumbersActivity extends AppCompatActivity {
             }
         });
 
+        //Release the Media Player once the audio playback is complete
         if(mMediaPlayer != null){
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
