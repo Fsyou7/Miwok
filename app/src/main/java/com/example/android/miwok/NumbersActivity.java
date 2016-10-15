@@ -25,23 +25,15 @@ public class NumbersActivity extends AppCompatActivity {
     //Create audio object
     private MediaPlayer mMediaPlayer;
 
-    /**
-     * Clean up the media player by releasing its resources.
-     */
-    private void releaseMediaPlayer() {
-        // If the media player is not null, then it may be currently playing a sound.
-        if (mMediaPlayer != null) {
-            // Regardless of the current state of the media player, release its resources
-            // because we no longer need it.
-            mMediaPlayer.release();
-
-            // Set the media player back to null. For our code, we've decided that
-            // setting the media player to null is an easy way to tell that the media player
-            // is not configured to play an audio file at the moment.
-            mMediaPlayer = null;
-            Log.d(TAG, "MediaPlayer released");
+    /*
+    * This listener gets triggered when the {@link Media Player} has completed playing the audio file
+    * */
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            releaseMediaPlayer();
         }
-    }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,21 +73,42 @@ public class NumbersActivity extends AppCompatActivity {
                 Word audioResource = (Word)listView.getItemAtPosition(position);
                 releaseMediaPlayer();
                 mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
+
+                //Start audio playback
                 mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+
+                //Release the Media Player once the audio playback is complete
+                mMediaPlayer.setOnCompletionListener(mCompletionListener);
             }
         });
-
-        //Release the Media Player once the audio playback is complete
-        if(mMediaPlayer != null){
-            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    releaseMediaPlayer();
-                }
-            });
-        }
-
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        /*
+        * When the activity is stopped, release the media player resources
+        * because we won't be playing anymore sounds*/
+        releaseMediaPlayer();
+    }
 
+    /**
+     * Clean up the media player by releasing its resources.
+     */
+    private void releaseMediaPlayer() {
+        // If the media player is not null, then it may be currently playing a sound.
+        if (mMediaPlayer != null) {
+            // Regardless of the current state of the media player, release its resources
+            // because we no longer need it.
+            mMediaPlayer.release();
+
+            // Set the media player back to null. For our code, we've decided that
+            // setting the media player to null is an easy way to tell that the media player
+            // is not configured to play an audio file at the moment.
+            mMediaPlayer = null;
+            Log.d(TAG, "MediaPlayer released");
+        }else{
+            Log.d(TAG, "MediaPlayer null, not released");
+        }
+    }
 }
