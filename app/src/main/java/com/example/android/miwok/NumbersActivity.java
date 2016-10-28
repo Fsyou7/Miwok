@@ -1,6 +1,7 @@
 package com.example.android.miwok;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import static android.R.attr.resource;
 
 public class NumbersActivity extends AppCompatActivity {
 
+    //Create a TAG constant for logging
     private static final String TAG = "NumbersActivity";
 
     //Create audio object
@@ -32,6 +34,13 @@ public class NumbersActivity extends AppCompatActivity {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
             releaseMediaPlayer();
+        }
+    };
+
+    private AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+
         }
     };
 
@@ -71,11 +80,27 @@ public class NumbersActivity extends AppCompatActivity {
             @Override
             public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
                 Word audioResource = (Word)listView.getItemAtPosition(position);
+
+                //Clear media player
                 releaseMediaPlayer();
+
                 mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
 
-                //Start audio playback
-                mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+                // Request audio focus for playback
+                AudioManager am = (AudioManager) NumbersActivity.this.getSystemService(Context.AUDIO_SERVICE);
+
+                int result = am.requestAudioFocus(afChangeListener,
+                        // Use the music stream.
+                        AudioManager.STREAM_MUSIC,
+                        // Request permanent focus.
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                    //am.registerMediaButtonEventReceiver(RemoteControlReceiver);
+
+                    // Start audio playback.
+                    mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+                }
 
                 //Release the Media Player once the audio playback is complete
                 mMediaPlayer.setOnCompletionListener(mCompletionListener);
@@ -90,6 +115,8 @@ public class NumbersActivity extends AppCompatActivity {
         * When the activity is stopped, release the media player resources
         * because we won't be playing anymore sounds*/
         releaseMediaPlayer();
+
+
     }
 
     /**
@@ -101,6 +128,8 @@ public class NumbersActivity extends AppCompatActivity {
             // Regardless of the current state of the media player, release its resources
             // because we no longer need it.
             mMediaPlayer.release();
+
+
 
             // Set the media player back to null. For our code, we've decided that
             // setting the media player to null is an easy way to tell that the media player
