@@ -40,6 +40,12 @@ public class NumbersActivity extends AppCompatActivity {
     private AudioManager.OnAudioFocusChangeListener afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
+            switch (focusChange){
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    // Lost focus for an unbounded amount of time: stop playback and release media player
+                    releaseMediaPlayer();
+                    break;
+            }
 
         }
     };
@@ -75,37 +81,41 @@ public class NumbersActivity extends AppCompatActivity {
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(adapter);
 
-        // Create a clickListener to play the audio file
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
-                Word audioResource = (Word)listView.getItemAtPosition(position);
+        // Request audio focus for playback
+        AudioManager am = (AudioManager) NumbersActivity.this.getSystemService(Context.AUDIO_SERVICE);
 
-                //Clear media player
-                releaseMediaPlayer();
+        int result = am.requestAudioFocus(afChangeListener,
+                // Use the music stream.
+                AudioManager.STREAM_MUSIC,
+                // Request permanent focus.
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
 
-                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            //am.registerMediaButtonEventReceiver(RemoteControlReceiver);
 
-                // Request audio focus for playback
-                AudioManager am = (AudioManager) NumbersActivity.this.getSystemService(Context.AUDIO_SERVICE);
+            // Create a clickListener to play the audio file
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
+                    Word audioResource = (Word)listView.getItemAtPosition(position);
 
-                int result = am.requestAudioFocus(afChangeListener,
-                        // Use the music stream.
-                        AudioManager.STREAM_MUSIC,
-                        // Request permanent focus.
-                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+                    //Clear media player
+                    releaseMediaPlayer();
 
-                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                    //am.registerMediaButtonEventReceiver(RemoteControlReceiver);
+                    mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
 
                     // Start audio playback.
                     mMediaPlayer.start(); // no need to call prepare(); create() does that for you
-                }
 
-                //Release the Media Player once the audio playback is complete
-                mMediaPlayer.setOnCompletionListener(mCompletionListener);
-            }
-        });
+                }
+            });
+
+        }
+
+        //Release the Media Player once the audio playback is complete
+       // mMediaPlayer.setOnCompletionListener(mCompletionListener);
+
+
     }
 
     @Override
@@ -128,8 +138,6 @@ public class NumbersActivity extends AppCompatActivity {
             // Regardless of the current state of the media player, release its resources
             // because we no longer need it.
             mMediaPlayer.release();
-
-
 
             // Set the media player back to null. For our code, we've decided that
             // setting the media player to null is an easy way to tell that the media player
