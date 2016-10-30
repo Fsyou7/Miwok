@@ -31,23 +31,22 @@ public class NumbersActivity extends AppCompatActivity {
     //Handles audio focus when playing a sound file
     private AudioManager mAudioManager;
 
-    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
-            new AudioManager.OnAudioFocusChangeListener() {
+    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
 
-                public void onAudioFocusChange(int focusChange) {
-                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ) {
-                        // Pause playback
-                        mMediaPlayer.pause();
-                        mMediaPlayer.seekTo(0);
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                        // The AUDIOFOCUS_GAIN state means we have regained focus and can resume playback
-                        mMediaPlayer.start();
-                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                        //The AUDIOFOCUS_LOSS case means we've lost audio focus and can stop playback and cleanup resources
-                        releaseMediaPlayer();
-                    }
-                }
-            };
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ) {
+                // Pause playback
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                // The AUDIOFOCUS_GAIN state means we have regained focus and can resume playback
+                mMediaPlayer.start();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                //The AUDIOFOCUS_LOSS case means we've lost audio focus and can stop playback and cleanup resources
+                releaseMediaPlayer();
+            }
+        }
+    };
 
     /*
     * This listener gets triggered when the {@link Media Player} has completed playing the audio file
@@ -93,35 +92,32 @@ public class NumbersActivity extends AppCompatActivity {
         // Create and setup the {@link AudioManager} to request audio focus
         mAudioManager = (AudioManager) NumbersActivity.this.getSystemService(Context.AUDIO_SERVICE);
 
-            // Create a clickListener to play the audio file
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
-                    Word audioResource = (Word)listView.getItemAtPosition(position);
+        // Create a clickListener to play the audio file
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){Word audioResource = (Word)listView.getItemAtPosition(position);
 
-                    //Clear media player
-                    releaseMediaPlayer();
+                //Clear media player
+                releaseMediaPlayer();
 
-                    // Create and setup the {@link AudioManager} to request audio focus
-                    int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
-                            // Use the music stream.
-                            AudioManager.STREAM_MUSIC,
-                            // Request permanent focus.
-                            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                // Create and setup the {@link AudioManager} to request audio focus
+                int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
+                        // Use the music stream.
+                        AudioManager.STREAM_MUSIC,
+                        // Request permanent focus.
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                     // We have audio focus now.
+                     mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
 
-                    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                        // We have audio focus now.
-                        mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
+                     // Start audio playback.
+                     mMediaPlayer.start(); // no need to call prepare(); create() does that for you
 
-                        // Start audio playback.
-                        mMediaPlayer.start(); // no need to call prepare(); create() does that for you
-
-                        //Release the Media Player once the audio playback is complete
-                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
-
-                    }
+                     //Release the Media Player once the audio playback is complete
+                     mMediaPlayer.setOnCompletionListener(mCompletionListener);
                 }
-            });
+            }
+        });
     }
 
     @Override
