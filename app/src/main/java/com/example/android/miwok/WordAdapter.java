@@ -34,10 +34,6 @@ public class WordAdapter extends ArrayAdapter<Word> {
         // going to use this second argument, so it can be any value. Here, we used 0.
         super(context, 0, words);
         mColorResource = color;
-
-//        public int getColorResource(){
-//        return mColorResource;
-//        }
     }
 
     /**
@@ -96,13 +92,10 @@ public class WordAdapter extends ArrayAdapter<Word> {
         * */
         ViewGroup listView = (ViewGroup) listItemView.findViewById(R.id.list_view);
 
-//        miwokTextView.setBackgroundColor(ContextCompat.getColor(getContext(), WordAdapter.mColorResource));
         listView.setBackgroundColor(ContextCompat.getColor(getContext(), mColorResource));
 
         // Return the whole list item layout (containing 2 TextViews)
         // so that it can be shown in the ListView
         return listItemView;
     }
-
-
 }
