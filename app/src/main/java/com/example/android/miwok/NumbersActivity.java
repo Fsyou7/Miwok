@@ -1,6 +1,7 @@
 package com.example.android.miwok;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,13 +18,35 @@ import java.util.List;
 import static android.R.attr.button;
 import static android.R.attr.id;
 import static android.R.attr.resource;
+import static android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT;
 
 public class NumbersActivity extends AppCompatActivity {
 
+    //Create a TAG constant for logging
     private static final String TAG = "NumbersActivity";
 
     //Create audio object
     private MediaPlayer mMediaPlayer;
+
+    //Handles audio focus when playing a sound file
+    private AudioManager mAudioManager;
+
+    AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ) {
+                // Pause playback
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                // The AUDIOFOCUS_GAIN state means we have regained focus and can resume playback
+                mMediaPlayer.start();
+            } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                //The AUDIOFOCUS_LOSS case means we've lost audio focus and can stop playback and cleanup resources
+                releaseMediaPlayer();
+            }
+        }
+    };
 
     /*
     * This listener gets triggered when the {@link Media Player} has completed playing the audio file
@@ -66,19 +89,33 @@ public class NumbersActivity extends AppCompatActivity {
         // {@link ListView} will display list items for each {@link Word} in the list.
         listView.setAdapter(adapter);
 
+        // Create and setup the {@link AudioManager} to request audio focus
+        mAudioManager = (AudioManager) NumbersActivity.this.getSystemService(Context.AUDIO_SERVICE);
+
         // Create a clickListener to play the audio file
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){
-                Word audioResource = (Word)listView.getItemAtPosition(position);
+            public void onItemClick (AdapterView < ? > adapter, View view, int position, long arg){Word audioResource = (Word)listView.getItemAtPosition(position);
+
+                //Clear media player
                 releaseMediaPlayer();
-                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
 
-                //Start audio playback
-                mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+                // Create and setup the {@link AudioManager} to request audio focus
+                int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener,
+                        // Use the music stream.
+                        AudioManager.STREAM_MUSIC,
+                        // Request permanent focus.
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                     // We have audio focus now.
+                     mMediaPlayer = MediaPlayer.create(NumbersActivity.this, audioResource.getAudioResourceId());
 
-                //Release the Media Player once the audio playback is complete
-                mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                     // Start audio playback.
+                     mMediaPlayer.start(); // no need to call prepare(); create() does that for you
+
+                     //Release the Media Player once the audio playback is complete
+                     mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
             }
         });
     }
@@ -106,6 +143,9 @@ public class NumbersActivity extends AppCompatActivity {
             // setting the media player to null is an easy way to tell that the media player
             // is not configured to play an audio file at the moment.
             mMediaPlayer = null;
+
+            //Abandon audio focus when playback is complete
+            mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
             Log.d(TAG, "MediaPlayer released");
         }else{
             Log.d(TAG, "MediaPlayer null, not released");
