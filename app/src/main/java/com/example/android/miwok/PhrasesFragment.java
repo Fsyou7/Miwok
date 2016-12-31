@@ -16,12 +16,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static android.support.v7.widget.StaggeredGridLayoutManager.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class PhrasesFragment extends Fragment {
 
-    private static final String TAG = "PhrasesActivity";
     //Create audio object
     private MediaPlayer mMediaPlayer;
 
@@ -78,8 +79,6 @@ public class PhrasesFragment extends Fragment {
 
             //Abandon audio focus when playback is complete
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
-
-            Log.d(TAG, "MediaPlayer released");
         }
     }
 

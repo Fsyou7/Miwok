@@ -18,13 +18,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static android.support.v7.widget.StaggeredGridLayoutManager.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class FamilyFragment extends Fragment {
-
-    //Create a TAG constant for logging
-    private static final String TAG = "FamilyActivity";
 
     //Create audio object
     private MediaPlayer mMediaPlayer;
@@ -56,7 +55,6 @@ public class FamilyFragment extends Fragment {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
             releaseMediaPlayer();
-            Log.d(TAG, "MediaPlayer released again");
         }
     };
 
@@ -77,7 +75,6 @@ public class FamilyFragment extends Fragment {
 
             //Abandon audio focus when playback is complete
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
-            Log.d(TAG, "MediaPlayer released");
         }
     }
 

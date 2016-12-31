@@ -16,14 +16,12 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import static android.support.v7.widget.StaggeredGridLayoutManager.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NumbersFragment extends Fragment {
-
-
-    //Create a TAG constant for logging
-    private static final String TAG = "NumbersActivity";
 
     //Create audio object
     private MediaPlayer mMediaPlayer;
@@ -89,9 +87,6 @@ public class NumbersFragment extends Fragment {
             // Regardless of whether or not we were granted audio focus, abandon it. This also
             // unregisters the AudioFocusChangeListener so we don't get anymore callbacks.
             mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
-            Log.d(TAG, "MediaPlayer released");
-        }else{
-            Log.d(TAG, "MediaPlayer null, not released");
         }
     }
 
