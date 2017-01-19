@@ -17,14 +17,22 @@
     <string name="app_name">Miwok</string>
 
     <!-- Category name for phrases [CHAR LIMIT=20] -->
-    <string name="category_phrases">Phrases</string>
 
     <!-- Category name for the vocabulary words for colors [CHAR LIMIT=20] -->
-    <string name="category_colors">Colors</string>
 
     <!-- Category name for the vocabulary words for numbers [CHAR LIMIT=20] -->
-    <string name="category_numbers">Numbers</string>
 
     <!-- Category name for the vocabulary words for family members [CHAR LIMIT=20] -->
-    <string name="category_family">Family Members</string>
+
+    <!-- Title for the Numbers fragment displayed in a tab -->
+    <string name="numbers_fragment">Numbers</string>
+
+    <!-- Title for the Family fragment displayed in a tab -->
+    <string name="family_fragment">Family</string>
+
+    <!-- Title for the Colors fragment displayed in a tab -->
+    <string name="colors_fragment">Colors</string>
+
+    <!-- Title for the Phrases fragment displayed in a tab -->
+    <string name="phrases_fragment">Phrases</string>
 </resources>
