@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        //Remove the drop shadow from the action bar
+        getSupportActionBar().setElevation(0);
     }
 
 }
